@@ -10,3 +10,7 @@
 *.dmp
 *.swp
 .tags
+/Build/
+/Bin/
+/build/
+!/utils/premake5.exe
