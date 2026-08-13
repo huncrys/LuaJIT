@@ -399,3 +399,14 @@ LUA_API lua_State *lua_newstate(lua_Alloc f, void *ud)
 
 #endif
 
+/* MTA Specific: state creation that takes the owner, for the lua_open() macro.
+** Wraps luaL_newstate rather than the newstate functions themselves, because the
+** real entry point differs per target (lj_state_newstate on 64 bit, lua_newstate
+** elsewhere) and both allocator variants above would otherwise need patching. */
+LUALIB_API lua_State *luaL_newstate_mtasa(void *mtasaowner)
+{
+  lua_State *L = luaL_newstate();
+  if (L)
+    lua_setmtasaowner(L, mtasaowner);
+  return L;
+}
