@@ -587,7 +587,7 @@ int main(int argc, char **argv)
   int status;
   lua_State *L;
   if (!argv[0]) argv = empty_argv; else if (argv[0][0]) progname = argv[0];
-  L = lua_open();
+  L = lua_open(NULL);  /* MTA Specific: lua_open now takes the owner. */
   if (L == NULL) {
     l_message("cannot create state: not enough memory");
     return EXIT_FAILURE;

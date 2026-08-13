@@ -1301,3 +1301,20 @@ LUA_API void lua_setallocf(lua_State *L, lua_Alloc f, void *ud)
   g->allocf = f;
 }
 
+/* -- MTA Specific -------------------------------------------------------- */
+
+/* Get the main state from a lua state that may be a coroutine. */
+LUA_API lua_State *lua_getmainstate(lua_State *L)
+{
+  return mainthread(G(L));
+}
+
+LUA_API void *lua_getmtasaowner(lua_State *L)
+{
+  return G(L)->mtasaowner;
+}
+
+LUA_API void lua_setmtasaowner(lua_State *L, void *mtasaowner)
+{
+  G(L)->mtasaowner = mtasaowner;
+}

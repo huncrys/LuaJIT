@@ -662,6 +662,11 @@ typedef struct global_State {
   MRef ctype_state;	/* Pointer to C type state. */
   PRNGState prng;	/* Global PRNG state. */
   GCRef gcroot[GCROOT_MAX];  /* GC roots. */
+  /* MTA Specific: pointer to this state's CLuaMain, mirroring the field the
+  ** MTA-patched Lua 5.1 keeps in lua_State. Appended at the tail so the offsets
+  ** buildvm bakes into the generated VM are unaffected. Held here rather than in
+  ** lua_State so coroutines see it without any propagation on lua_newthread. */
+  void *mtasaowner;
 } global_State;
 
 #define mainthread(g)	(&gcref(g->mainthref)->th)

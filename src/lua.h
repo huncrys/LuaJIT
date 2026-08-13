@@ -112,6 +112,12 @@ LUA_API lua_State *(lua_newstate) (lua_Alloc f, void *ud);
 LUA_API void       (lua_close) (lua_State *L);
 LUA_API lua_State *(lua_newthread) (lua_State *L);
 
+/* MTA Specific functions, matching the MTA-patched Lua 5.1 API.
+** ChrML: Added function to get the main state from a lua state that is a coroutine */
+LUA_API lua_State* (lua_getmainstate) (lua_State* L);
+LUA_API void *lua_getmtasaowner(lua_State* L);
+LUA_API void lua_setmtasaowner(lua_State* L, void *mtasaowner);
+
 LUA_API lua_CFunction (lua_atpanic) (lua_State *L, lua_CFunction panicf);
 
 
@@ -286,7 +292,9 @@ LUA_API void lua_setallocf (lua_State *L, lua_Alloc f, void *ud);
 ** compatibility macros and functions
 */
 
-#define lua_open()	luaL_newstate()
+/* MTA Specific: takes the owner at construction, matching the patched Lua 5.1,
+** so it cannot be forgotten the way a separate lua_setmtasaowner call could be. */
+#define lua_open(mtasaowner)	luaL_newstate_mtasa(mtasaowner)
 
 #define lua_getregistry(L)	lua_pushvalue(L, LUA_REGISTRYINDEX)
 
