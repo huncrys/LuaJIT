@@ -1318,3 +1318,31 @@ LUA_API void lua_setmtasaowner(lua_State *L, void *mtasaowner)
 {
   G(L)->mtasaowner = mtasaowner;
 }
+
+/* The patched Lua 5.1 stores nresults in lua_State on every C call. LuaJIT
+** needs no bookkeeping for it: a C function called from Lua returns to the
+** instruction after the call, and that CALL/CALLM/ITERC encodes the wanted
+** result count + 1 in operand B (0 for multiple results). Tail calls reuse the
+** caller's frame, so they report what the original call site wanted. This is
+** the same lookup the recorder uses in results_wanted() (lj_ffrecord.c).
+**
+** A C function called from a trace runs under a trace stitching continuation
+** instead of the Lua frame (see recff_stitch). That frame keeps the call
+** site's PC, which lj_cont_stitch reads the wanted result count from as well.
+** Other continuations belong to metamethods, whose triggering instruction is
+** not a call, so they report -1.
+*/
+LUA_API int lua_ncallresult(lua_State *L)
+{
+  TValue *frame = L->base-1;
+  const BCIns *pc;
+  if (frame_islua(frame))
+    pc = frame_pc(frame);
+#if LJ_HASJIT
+  else if (frame_iscont(frame) && frame_contf(frame) == lj_cont_stitch)
+    pc = frame_contpc(frame);
+#endif
+  else
+    return -1;
+  return (int)bc_b(pc[-1]) - 1;
+}

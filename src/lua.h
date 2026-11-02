@@ -117,6 +117,12 @@ LUA_API lua_State *(lua_newthread) (lua_State *L);
 LUA_API lua_State* (lua_getmainstate) (lua_State* L);
 LUA_API void *lua_getmtasaowner(lua_State* L);
 LUA_API void lua_setmtasaowner(lua_State* L, void *mtasaowner);
+/* MTA Specific: number of results the caller of the running C function expects,
+** or -1 for "any" (multiple results, or a call that did not come from Lua code).
+** Like the patched Lua 5.1, it reports what the call site asked for, so
+**   local a, b = f()
+** yields 2 whatever f actually returns. */
+LUA_API int (lua_ncallresult) (lua_State* L);
 
 LUA_API lua_CFunction (lua_atpanic) (lua_State *L, lua_CFunction panicf);
 
